@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"net/http"
+	"net/mail"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -28,6 +29,10 @@ func HashPassword(password string) (string, error) {
 
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+func valid_email(email string) bool {
+	_, err := mail.ParseAddress(email)
 	return err == nil
 }
 
@@ -67,6 +72,11 @@ func CreatePersonEndpoint(response http.ResponseWriter, request *http.Request) {
 	collection := client.Database("rupin_patel_appointy").Collection("people")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	cursor, err := collection.Find(ctx, bson.M{})
+	if valid_email(person.Email) == false {
+		response.WriteHeader(http.StatusInternalServerError)
+		response.Write([]byte("in valid email id please try again"))
+		return
+	}
 	for cursor.Next(ctx) {
 		var backlogperson Person
 		cursor.Decode(&backlogperson)
