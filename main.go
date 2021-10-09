@@ -272,6 +272,7 @@ func main() {
 	router.HandleFunc("/posts", CreatePostEndpoint).Methods("POST")
 	router.HandleFunc("/posts/{id}", GetPostEndpoint).Methods("GET")
 	router.HandleFunc("/posts/users/{id}", GetPostsEndpoint).Methods("GET")
+
 	http.ListenAndServe(":12345", router)
 
 }
